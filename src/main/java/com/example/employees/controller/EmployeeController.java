@@ -1,30 +1,26 @@
 package com.example.employees.controller;
 
+import com.example.employees.dto.EmployeeDTO;
 import com.example.employees.model.AccountInfo;
-import com.example.employees.model.Contract;
 import com.example.employees.model.Employee;
 import com.example.employees.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/employees")
+
 public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
 
     @GetMapping
-    public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+    public List<EmployeeDTO> getAllEmployees() {
+        return employeeService.getAllEmployeesDTO();
     }
 
     @GetMapping("/{employeeId}")

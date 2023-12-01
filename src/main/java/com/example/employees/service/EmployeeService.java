@@ -1,5 +1,7 @@
 package com.example.employees.service;
 
+import com.example.employees.dto.EmployeeDTO;
+import com.example.employees.mapper.EmployeeMapper;
 import com.example.employees.model.AccountInfo;
 import com.example.employees.model.Contract;
 import com.example.employees.model.Employee;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -17,13 +20,10 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
-    }
+    @Autowired
+    private EmployeeMapper employeeMapper;
 
-    public Employee getEmployeeById(UUID employeeId) {
-        return employeeRepository.findById(employeeId).orElse(null);
-    }
+
 
     public Employee saveEmployee(@RequestBody Employee employee) {
         Employee newEmployee = new Employee();
@@ -36,30 +36,40 @@ public class EmployeeService {
         return employeeRepository.save(newEmployee);
     }
 
+    public List<EmployeeDTO> getAllEmployeesDTO() {
+        List<Employee> employees = employeeRepository.findAll();
+        return employees.stream()
+                .map(EmployeeMapper::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public Employee getEmployeeById(UUID employeeId) {
+        return employeeRepository.findById(employeeId).orElse(null);
+    }
+
 
     public Employee updateEmployee(UUID employeeId, Employee updatedEmployee) {
         Employee existingEmployee = getEmployeeById(employeeId);
 
         if (existingEmployee == null) {
-            // Obsługa przypadku, gdy pracownik nie istnieje
             return null;
         }
 
         if (updatedEmployee.getName() != null) {
             existingEmployee.setName(updatedEmployee.getName());
+            existingEmployee.setLastUpdate(LocalDateTime.now());
         }
 
         if (updatedEmployee.getSurname() != null) {
             existingEmployee.setSurname(updatedEmployee.getSurname());
+            existingEmployee.setLastUpdate(LocalDateTime.now());
         }
 
         if (updatedEmployee.getEmail() != null) {
             existingEmployee.setEmail(updatedEmployee.getEmail());
+            existingEmployee.setLastUpdate(LocalDateTime.now());
         }
 
-
-
-        // Zapisz zaktualizowanego pracownika
         return employeeRepository.save(existingEmployee);
     }
 

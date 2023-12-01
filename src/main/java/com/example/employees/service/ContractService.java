@@ -1,5 +1,7 @@
 package com.example.employees.service;
 
+import com.example.employees.dto.ContractDTO;
+import com.example.employees.mapper.ContractMapper;
 import com.example.employees.model.Contract;
 import com.example.employees.model.Employee;
 import com.example.employees.repository.ContractRepository;
@@ -20,6 +22,8 @@ public class ContractService {
     private EmployeeRepository employeeRepository;
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private ContractMapper contractMapper;
 
     public List<Contract> getAllContracts() {
         return contractRepository.findAll();
@@ -29,25 +33,24 @@ public class ContractService {
         return contractRepository.findById(id).orElse(null);
     }
 
-    public Contract createContract(UUID employeeId, Contract body) {
+    public Contract createContract(UUID employeeId, ContractDTO contractDTO) {
         Employee employee = employeeService.getEmployeeById(employeeId);
 
-        Contract newContract = new Contract();
-        newContract.setContractType(body.getContractType());
-        newContract.setSalary(body.getSalary());
-        newContract.setContractDate(body.getContractDate());
-        newContract.setValidityOfContract(body.getValidityOfContract());
+        if (employee == null) {
+            // Obsługa błędu: pracownik nie istnieje
+            return null;
+        }
 
+        Contract newContract = contractMapper.convertToEntity(contractDTO);
         newContract.setEmployee(employee);
 
         Contract savedContract = contractRepository.save(newContract);
 
-//        List<Contract> employeeContracts = employee.getContracts();
-//        employee.setContracts(savedContract.getId());
-//        employeeRepository.save(employee);
+        // Możesz dodać inne operacje lub logikę tutaj
 
         return savedContract;
     }
+
 
     public Contract updateContract(UUID id, Contract updatedContract) {
         Contract contract = contractRepository.findById(id).orElse(null);

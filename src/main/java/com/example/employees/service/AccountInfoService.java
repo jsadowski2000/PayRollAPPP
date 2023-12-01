@@ -1,5 +1,9 @@
 package com.example.employees.service;
 
+import com.example.employees.dto.AccountInfoDTO;
+import com.example.employees.dto.ContractDTO;
+import com.example.employees.mapper.AccountInfoMapper;
+import com.example.employees.mapper.ContractMapper;
 import com.example.employees.model.AccountInfo;
 import com.example.employees.model.Contract;
 import com.example.employees.model.Employee;
@@ -8,6 +12,7 @@ import com.example.employees.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +24,8 @@ public class AccountInfoService {
     private EmployeeRepository employeeRepository;
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private AccountInfoMapper accountInfoMapper;
 
     public List<AccountInfo> getAllAccountInfo() {
         return accountInfoRepository.findAll();
@@ -28,33 +35,25 @@ public class AccountInfoService {
         return accountInfoRepository.findById(id).orElse(null);
     }
 
-    public AccountInfo createAccountInfo(UUID employeeId, AccountInfo body) {
+    public AccountInfo createAccountInfo(UUID employeeId, AccountInfoDTO accountInfoDTO) {
         Employee employee = employeeService.getEmployeeById(employeeId);
 
-        AccountInfo newAccountInfo = new AccountInfo();
-        newAccountInfo.setAccountType(body.getAccountType());
-        newAccountInfo.setAccountNumber(body.getAccountNumber());
+        if (employee == null) {
+            // Obsługa błędu: pracownik nie istnieje
+            return null;
+        }
+
+        AccountInfo newAccountInfo = accountInfoMapper.convertToEntity(accountInfoDTO);
         newAccountInfo.setEmployee(employee);
 
         AccountInfo savedAccountInfo = accountInfoRepository.save(newAccountInfo);
+
+        // Możesz dodać inne operacje lub logikę tutaj
+
         return savedAccountInfo;
-
     }
 
-    public AccountInfo updateAccountInfo(UUID id, AccountInfo updatedAccountInfo) {
-        AccountInfo accountInfo = accountInfoRepository.findById(id).orElse(null);
-        if (accountInfo != null) {
-            // Aktualizacja pól informacji o koncie
-            accountInfo.setAccountType(updatedAccountInfo.getAccountType());
-            accountInfo.setAccountNumber(updatedAccountInfo.getAccountNumber());
-
-            // Aktualizacja relacji z pracownikiem
-            accountInfo.setEmployee(updatedAccountInfo.getEmployee());
-
-            return accountInfoRepository.save(accountInfo);
-        }
-        return null;
-    }
+    
 
     public void deleteAccountInfo(UUID id) {
         accountInfoRepository.deleteById(id);

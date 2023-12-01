@@ -1,6 +1,7 @@
 package com.example.employees.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -42,10 +43,12 @@ public class Employee {
     @LastModifiedDate
     private LocalDateTime lastUpdate;
 
-    @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER)
+
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
     private List<Contract> contracts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
     private List<AccountInfo> accountsInfo = new ArrayList<>();
 
 
