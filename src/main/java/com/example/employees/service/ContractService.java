@@ -52,23 +52,61 @@ public class ContractService {
     }
 
 
-    public Contract updateContract(UUID id, Contract updatedContract) {
-        Contract contract = contractRepository.findById(id).orElse(null);
-        if (contract != null) {
-            // Aktualizacja pól umowy
-            contract.setContractType(updatedContract.getContractType());
-            contract.setSalary(updatedContract.getSalary());
-            contract.setValidityOfContract(updatedContract.getValidityOfContract());
+    public Contract updateContract(UUID employeeId, UUID contractId, ContractDTO updatedContractDTO) {
+        Employee employee = employeeService.getEmployeeById(employeeId);
 
-            // Aktualizacja relacji z pracownikiem
-            contract.setEmployee(updatedContract.getEmployee());
-
-            return contractRepository.save(contract);
+        if (employee == null) {
+            // Obsługa błędu: pracownik nie istnieje
+            return null;
         }
-        return null;
+
+        Contract existingContract = contractRepository.findByIdAndEmployeeId(contractId, employeeId);
+
+        if (existingContract == null) {
+            // Obsługa błędu: umowa nie istnieje lub nie należy do danego pracownika
+            return null;
+        }
+
+        // Aktualizuj istniejącą umowę tylko jeśli dane są dostarczone
+        if (updatedContractDTO.getContractType() != null) {
+            existingContract.setContractType(updatedContractDTO.getContractType());
+        }
+        if (updatedContractDTO.getSalary() != 0.0) {
+            existingContract.setSalary(updatedContractDTO.getSalary());
+        }
+        if (updatedContractDTO.getContractDate() != null) {
+            existingContract.setContractDate(updatedContractDTO.getContractDate());
+        }
+        if (updatedContractDTO.getValidityOfContract() != null) {
+            existingContract.setValidityOfContract(updatedContractDTO.getValidityOfContract());
+        }
+
+        Contract updatedContract = contractRepository.save(existingContract);
+
+        // Możesz dodać inne operacje lub logikę tutaj
+
+        return updatedContract;
     }
 
-    public void deleteContract(UUID id) {
-        contractRepository.deleteById(id);
+
+    public void deleteContract(UUID employeeId, UUID contractId) {
+        Employee employee = employeeService.getEmployeeById(employeeId);
+
+        if (employee == null) {
+            // Obsługa błędu: pracownik nie istnieje
+            return;
+        }
+
+        Contract existingContract = contractRepository.findByIdAndEmployeeId(contractId, employeeId);
+
+        if (existingContract == null) {
+            // Obsługa błędu: umowa nie istnieje lub nie należy do danego pracownika
+            return;
+        }
+
+        // Usuń umowę
+        contractRepository.delete(existingContract);
+
+
     }
 }

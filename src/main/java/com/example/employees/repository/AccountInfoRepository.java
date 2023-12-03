@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface AccountInfoRepository extends JpaRepository<AccountInfo, UUID> {
+
+    AccountInfo findByIdAndEmployeeId(UUID accountInfoId, UUID employeeId);
 }

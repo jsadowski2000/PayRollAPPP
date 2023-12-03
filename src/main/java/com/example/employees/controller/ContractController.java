@@ -30,5 +30,28 @@ public class ContractController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+    @PutMapping("/{employeeId}/{contractId}")
+    public ResponseEntity<Contract> updateContract(
+            @PathVariable UUID employeeId,
+            @PathVariable UUID contractId,
+            @RequestBody ContractDTO updatedContractDTO) {
 
+        Contract updatedContract = contractService.updateContract(employeeId, contractId, updatedContractDTO);
+
+        if (updatedContract != null) {
+            return ResponseEntity.ok(updatedContract);
+        } else {
+            return ResponseEntity.notFound().build(); // Możesz dostosować status odpowiedzi do swoich potrzeb
+        }
+    }
+
+    @DeleteMapping("/{employeeId}/{contractId}")
+    public ResponseEntity<Void> deleteContract(
+            @PathVariable UUID employeeId,
+            @PathVariable UUID contractId) {
+
+        contractService.deleteContract(employeeId, contractId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

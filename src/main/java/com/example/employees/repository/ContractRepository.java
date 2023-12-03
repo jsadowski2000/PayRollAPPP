@@ -7,5 +7,7 @@ import java.util.UUID;
 
 public interface ContractRepository extends JpaRepository<Contract, UUID> {
 
+    Contract findByIdAndEmployeeId(UUID contractId, UUID employeeId);
+
 
 }

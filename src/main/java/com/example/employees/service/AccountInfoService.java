@@ -52,10 +52,59 @@ public class AccountInfoService {
 
         return savedAccountInfo;
     }
+    public AccountInfo updateAccountInfo(UUID employeeId, UUID accountInfoId, AccountInfoDTO updatedAccountInfoDTO) {
+        Employee employee = employeeService.getEmployeeById(employeeId);
+
+        if (employee == null) {
+            // Obsługa błędu: pracownik nie istnieje
+            return null;
+        }
+
+        AccountInfo existingAccountInfo = accountInfoRepository.findByIdAndEmployeeId(accountInfoId, employeeId);
+
+        if (existingAccountInfo == null) {
+            // Obsługa błędu: accountInfo nie istnieje lub nie należy do danego pracownika
+            return null;
+        }
+
+        // Aktualizuj istniejące konto tylko jeśli dane są dostarczone
+        if (updatedAccountInfoDTO.getAccountType() != null) {
+            existingAccountInfo.setAccountType(updatedAccountInfoDTO.getAccountType());
+        }
+        if (updatedAccountInfoDTO.getAccountNumber() != 0) {
+            existingAccountInfo.setAccountNumber(updatedAccountInfoDTO.getAccountNumber());
+        }
+
+        AccountInfo updatedAccountInfo = accountInfoRepository.save(existingAccountInfo);
+
+        // Możesz dodać inne operacje lub logikę tutaj
+
+        return updatedAccountInfo;
+    }
+
+
+    public void deleteAccountInfo(UUID employeeId, UUID accountInfoId) {
+        Employee employee = employeeService.getEmployeeById(employeeId);
+
+        if (employee == null) {
+            // Obsługa błędu: pracownik nie istnieje
+            return;
+        }
+
+        AccountInfo existingAccountInfo = accountInfoRepository.findByIdAndEmployeeId(accountInfoId, employeeId);
+
+        if (existingAccountInfo == null) {
+            // Obsługa błędu: umowa nie istnieje lub nie należy do danego pracownika
+            return;
+        }
+
+        // Usuń umowę
+        accountInfoRepository.delete(existingAccountInfo);
+
+
+    }
+}
 
     
 
-    public void deleteAccountInfo(UUID id) {
-        accountInfoRepository.deleteById(id);
-    }
-}
+

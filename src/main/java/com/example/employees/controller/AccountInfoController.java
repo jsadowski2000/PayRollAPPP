@@ -32,5 +32,28 @@ public class AccountInfoController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+    @PutMapping("/{employeeId}/{accountInfoId}")
+    public ResponseEntity<AccountInfo> updateAccountInfo(
+            @PathVariable UUID employeeId,
+            @PathVariable UUID accountInfoId,
+            @RequestBody AccountInfoDTO updatedAccountInfoDTO) {
 
+        AccountInfo updatedAccountInfo = accountInfoService.updateAccountInfo(employeeId, accountInfoId, updatedAccountInfoDTO);
+
+        if (updatedAccountInfo != null) {
+            return ResponseEntity.ok(updatedAccountInfo);
+        } else {
+            return ResponseEntity.notFound().build(); // Możesz dostosować status odpowiedzi do swoich potrzeb
+        }
+    }
+
+    @DeleteMapping("/{employeeId}/{accountInfoId}")
+    public ResponseEntity<Void> deleteContract(
+            @PathVariable UUID employeeId,
+            @PathVariable UUID accountInfoId) {
+
+        accountInfoService.deleteAccountInfo(employeeId, accountInfoId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
